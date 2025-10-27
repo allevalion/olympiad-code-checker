@@ -176,15 +176,23 @@ def main():
                     driver.get(SITE_URL.rstrip("/") + "/" + code.lstrip("/"))
                 time.sleep(1.0)
                 ok, user_info_text, score, max_score = check_result_and_logout(driver)
-                if ok and (user_info_text != "код не использован"):
-                    results_report.append((user_info_text, code, score, max_score))
-                    success_count += 1
-                    if SEARCH_MODE == "FIRST_MATCH":
+                
+                if SEARCH_MODE == "FIRST_MATCH":
+                    if ok and (user_info_text != "код не использован"):
+                        results_report.append((user_info_text, code, score, max_score))
+                        success_count += 1
                         break
+                        
+                elif SEARCH_MODE == "REPORT":
+                    if user_info_text != "код не использован":
+                        results_report.append((user_info_text, code, score, max_score))
+                        success_count += 1
+                        
             except Exception as e:
                 log(f"Ошибка при проверке '{code}': {repr(e)}", "DEBUG")
             finally:
                 time.sleep(SLEEP_BETWEEN)
+                
             if LOG_LEVEL != "DEBUG" and SEARCH_MODE != "FIRST_MATCH":
                 print_progress(idx, total_codes, success_count)
 
@@ -196,7 +204,7 @@ def main():
             df_report = df_report.sort_values(by="Баллы", ascending=False)
             report_file = generate_unique_filename(f"Отчет_{subject.replace(' ', '_')}.xlsx")
             df_report.to_excel(report_file, index=False)
-            print(f"✅ Отчxт сформирован: {report_file}")
+            print(f"✅ Отчет сформирован: {report_file}")
 
         elif SEARCH_MODE == "FIRST_MATCH" and results_report:
             print(f"✅ Найдено совпадение: {results_report[0][0]} ({results_report[0][2]}/{results_report[0][3]} баллов)")
