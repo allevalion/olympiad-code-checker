@@ -1,0 +1,37 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            🚀 Automated release for ${{ github.ref_name }}
+
+            This release was automatically created when a new tag was pushed.
+
+            ### Основные изменения:
+            - Автоматическое определение статусов и наград участников
+            - Парсинг таблицы проходных баллов
+            - Улучшенная система отчетов
+
+            ### Файлы проекта:
+            - `check_codes.py` - основной скрипт
+            - `README.md` - документация
+            - `example_codes.xlsx` - пример файла с кодами
+          draft: false
+          prerelease: false
